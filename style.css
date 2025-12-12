@@ -1,0 +1,76 @@
+    body {
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 30px;
+    }
+    h1 { font-size: 40px; }
+
+    #status {
+        font-size: 24px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #222;
+        border-radius: 10px;
+    }
+
+    #timer {
+        font-size: 30px;
+        margin-top: 15px;
+        color: gold;
+    }
+
+    #buttons {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(3, 180px);
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .action-btn {
+        padding: 20px;
+        font-size: 22px;
+        background: #444;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #666;
+        transform: scale(1.05);
+    }
+
+
+    #ignore {
+        background: crimson;
+        padding: 20px; 
+        font-size: 40px;
+        grid-column: span 3; 
+        border-radius: 20px;
+    }
+
+    #start {
+        margin-top: 25px;
+        padding: 15px 40px;
+        font-size: 22px;
+        background: #0a74ff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    #start:hover{
+        background-color: #2279ebd1;
+        transform: scale(1.05);
+    }
+
+    #score {
+        font-size: 26px;
+        margin-top: 20px;
+    }
