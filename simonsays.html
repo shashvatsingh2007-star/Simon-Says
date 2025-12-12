@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simon Says - Audio Command Game</title>
+<style>
+    body {
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 30px;
+    }
+    h1 { font-size: 40px; }
+
+    #status {
+        font-size: 24px;
+        margin-top: 20px;
+        padding: 15px;
+        background: #222;
+        border-radius: 10px;
+    }
+
+    #timer {
+        font-size: 30px;
+        margin-top: 15px;
+        color: gold;
+    }
+
+    #buttons {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(3, 180px);
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .action-btn {
+        padding: 20px;
+        font-size: 22px;
+        background: #444;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #666;
+        transform: scale(1.05);
+    }
+
+    /* IGNORE BUTTON — 3 TIMES BIGGER */
+    #ignore {
+        background: crimson;
+        padding: 20px; /* triple height */
+        font-size: 40px; /* triple text size */
+        grid-column: span 3; /* triple width */
+        border-radius: 20px;
+    }
+
+    #start {
+        margin-top: 25px;
+        padding: 15px 40px;
+        font-size: 22px;
+        background: #0a74ff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    #score {
+        font-size: 26px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Simon Says</h1>
+
+<div id="status">Click Start to begin</div>
+<div id="timer">Timer: --</div>
+
+<button id="start" onclick="startGame()">Start Game</button>
+<div id="score">Score: 0</div>
+
+<div id="buttons">
+
+    <!-- 6 ACTION BUTTONS -->
+    <button class="action-btn" onclick="playerAction('touch your nose')">Touch Nose</button>
+    <button class="action-btn" onclick="playerAction('jump')">Jump</button>
+    <button class="action-btn" onclick="playerAction('clap your hands')">Clap Hands</button>
+    <button class="action-btn" onclick="playerAction('turn around')">Turn Around</button>
+    <button class="action-btn" onclick="playerAction('raise your hand')">Raise Hand</button>
+    <button class="action-btn" onclick="playerAction('sit down')">Sit Down</button>
+
+    <!-- BIG IGNORE BUTTON -->
+    <button class="action-btn" id="ignore" onclick="ignoreCommand()">IGNORE COMMAND</button>
+
+</div>
+
+<script>
+    let commands = [
+        "touch your nose",
+        "jump",
+        "clap your hands",
+        "turn around",
+        "raise your hand",
+        "sit down"
+    ];
+
+    let currentCommand = "";
+    let simonSaid = false;
+    let score = 0;
+    let acceptingInput = false;
+
+    let timerValue = 10;
+    let timerInterval;
+    let minTime = 3;
+
+    function speak(text) {
+        let msg = new SpeechSynthesisUtterance(text);
+        msg.rate = 1;
+        speechSynthesis.speak(msg);
+    }
+
+    function startGame() {
+        score = 0;
+        timerValue = 10;
+        document.getElementById("score").innerText = "Score: 0";
+        nextCommand();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        let timeLeft = timerValue;
+        document.getElementById("timer").innerText = "Timer: " + timeLeft.toFixed(1);
+
+        timerInterval = setInterval(() => {
+            timeLeft -= 0.1;
+            document.getElementById("timer").innerText = "Timer: " + timeLeft.toFixed(1);
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                gameOver();
+            }
+        }, 100);
+    }
+
+    function adjustTimerDifficulty() {
+        if (score > 0 && score % 10 === 0) {
+            timerValue -= 0.5;
+            if (timerValue < minTime) timerValue = minTime;
+        }
+    }
+
+    function nextCommand() {
+        acceptingInput = true;
+        adjustTimerDifficulty();
+        startTimer();
+
+        document.getElementById("status").innerText = "Listen to the command...";
+
+        let randomAction = commands[Math.floor(Math.random() * commands.length)];
+        let saySimon = Math.random() < 0.5;
+
+        simonSaid = saySimon;
+        currentCommand = randomAction;
+
+        let fullCommand = saySimon ? "Simon says " + randomAction : randomAction;
+        speak(fullCommand);
+    }
+
+    function playerAction(action) {
+        if (!acceptingInput) return;
+
+        clearInterval(timerInterval);
+
+        if (simonSaid && action === currentCommand) {
+            score++;
+            document.getElementById("score").innerText = "Score: " + score;
+            speak("Correct!");
+            acceptingInput = false;
+            setTimeout(nextCommand, 1200);
+        } else {
+            gameOver();
+        }
+    }
+
+    function ignoreCommand() {
+        if (!acceptingInput) return;
+
+        clearInterval(timerInterval);
+
+        if (!simonSaid) {
+            score++;
+            document.getElementById("score").innerText = "Score: " + score;
+            speak("Good job ignoring!");
+            acceptingInput = false;
+            setTimeout(nextCommand, 1200);
+        } else {
+            gameOver();
+        }
+    }
+
+    function gameOver() {
+        acceptingInput = false;
+        clearInterval(timerInterval);
+        speak("Wrong! Game Over.");
+        document.getElementById("status").innerText =
+            "Game Over! Final Score: " + score;
+        document.getElementById("timer").innerText = "Timer: --";
+    }
+</script>
+
+</body>
+</html>
